@@ -97,9 +97,11 @@ do
                 WARNING "$username is online for more than $TIME_LIMIT mins. \
                     Try to reconnect..."
                 reconnect
+            else
+                break
             fi
+        else
             break
         fi
-        break
     fi
 done
