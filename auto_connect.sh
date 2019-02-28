@@ -1,3 +1,8 @@
+### authors
+# YangYiFei spark11
+# Special thanks to Gu ZhaoYuan spark10
+# ref: https://github.com/guzhaoyuan/net.tsinghua/blob/master/linux/netTHU
+
 ### constants
 # standard account username and md5
 ACCOUNT_FILE=/etc/.auto_connect.cfg
@@ -59,20 +64,37 @@ function getStatus {
     fi
 }
 
-# TODO
+function logout {
+    curl -L net.tsinghua.edu.cn/do_login.php --data "action=logout"
+}
+
+function login {
+    read USERNAME PASSWD <<< `cat $ACCOUNT_FILE`
+    result=$(curl -sL net.tsinghua.edu.cn/do_login.php --data "action=login&username="$USERNAME"&password={MD5_HEX}"$PASSWD"&ac_id=1")
+    status=`echo $result |awk '{print $3}'`
+    if [ $status != "successful." ]; then
+        error=`echo $result | awk '{print $1}'`
+    if [ $error = "E2532:" ];then
+        ERROR "(E2532) Failed to connect: Login too frequently."
+    elif [ $error = "E2553:" ];then
+        ERROR "(E2553) Failed to connect: Invalid Account"
+    fi
+}
+
 # logout from current network, then log in
 function reconnect {
-    read USERNAME PASSWD <<< cat ACCOUNT_FILE
+    logout
+    sleep 10
+    login
     echo
 }
 
 ### main
-read UNLIMITED_USERNAME PASSWD <<< cat ACCOUNT_FILE
 for try in {1..5}
 do
     status=$(getStatus)
     if [ -z $status ]; then
-        ERROR "Offline. #$try Try to reconnect..."
+        ERROR "Offline. #$try/5 Try to reconnect..."
         reconnect
     else
         # load status into variables
