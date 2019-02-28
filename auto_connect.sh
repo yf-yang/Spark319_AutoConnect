@@ -69,8 +69,8 @@ function logout {
 }
 
 function login {
-    read USERNAME PASSWD <<< `cat $ACCOUNT_FILE`
-    result=$(curl -sL net.tsinghua.edu.cn/do_login.php --data "action=login&username="$USERNAME"&password={MD5_HEX}"$PASSWD"&ac_id=1")
+    read USERNAME MD5 <<< `cat $ACCOUNT_FILE`
+    result=$(curl -sL net.tsinghua.edu.cn/do_login.php --data "action=login&username="$USERNAME"&password={MD5_HEX}"$MD5"&ac_id=1")
     status=`echo $result |awk '{print $3}'`
     if [ $status != "successful." ]; then
         error=`echo $result | awk '{print $1}'`
@@ -81,7 +81,7 @@ function login {
     fi
 }
 
-# logout from current network, then log in
+# logout from current network, then login
 function reconnect {
     logout
     sleep 10
@@ -90,11 +90,12 @@ function reconnect {
 }
 
 ### main
+read UNLIMITED_USERNAME MD5 <<< `cat $ACCOUNT_FILE`
 for try in {1..5}
 do
     status=$(getStatus)
     if [ -z $status ]; then
-        ERROR "Offline. #$try/5 Try to reconnect..."
+        INFO "Offline. #$try/5 Try to reconnect..."
         reconnect
     else
         # load status into variables
