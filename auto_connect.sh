@@ -98,7 +98,7 @@ function login {
             elif [[ $error == "E2553:" ]]; then
                 ERROR "(E2553) Failed to connect: Invalid Account."
             else
-                ERROR "Unknown Error $error."
+                ERROR "Unknown Error: $result."
             fi
         else
             INFO "Login successful."
