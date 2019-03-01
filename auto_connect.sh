@@ -71,7 +71,7 @@ function ERROR {
 # arg $9 - IP address
 # arg $12 - balance of the account in Yuan
 function getStatus {
-    response=$(curl -s --connect-timeout 5 --get $STATUS_URL)
+    response=$(curl -s -m 5 --get $STATUS_URL)
     # Disconnect or Timeout
     if [ -z $response ]; then
         echo 
@@ -86,7 +86,7 @@ function logout {
 
 function login {
     read USERNAME MD5 <<< `cat $ACCOUNT_FILE`
-    result=$(curl -sL $LOGIN_URL --connect-timeout 5 --data "action=login&username="$USERNAME"&password={MD5_HEX}"$MD5"&ac_id=1")
+    result=$(curl -sL $LOGIN_URL -m 5 --data "action=login&username="$USERNAME"&password={MD5_HEX}"$MD5"&ac_id=1")
     if [ -z result ]; then
         status=`echo $result | awk '{print $3}'`
         if [[ $status != "successful." ]]; then
