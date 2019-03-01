@@ -1,4 +1,9 @@
-### authors
+#!/bin/bash
+
+### source repo 
+# https://github.com/yf-yang/Spark319_AutoConnect
+
+### author
 # YangYiFei spark11
 # Thanks to Zhao WenLiang [spark12] for assisting debug.
 # Thanks to Gu ZhaoYuan [spark10] for his codes.
@@ -10,7 +15,7 @@
 TIME_LIMIT=30
 
 # interval in seconds between logout and login
-SLEEP_INTERVAL=10
+SLEEP_INTERVAL=20
 
 # max number of retry every time
 MAX_RETRY=5
