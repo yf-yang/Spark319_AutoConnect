@@ -1,15 +1,23 @@
 ### authors
 # YangYiFei spark11
-# Special thanks to Gu ZhaoYuan spark10
+# Thanks to Zhao WenLiang [spark12] for assisting debug.
+# Thanks to Gu ZhaoYuan [spark10] for his codes.
 # ref: https://github.com/guzhaoyuan/net.tsinghua/blob/master/linux/netTHU
+
+### configurations
+# allow other users to stay for at most TIME_LIMIT mins
+# to avoid wasting their balance.
+TIME_LIMIT=30
+
+# interval in seconds between logout and login
+SLEEP_INTERVAL=10
+
+# max number of retry every time
+MAX_RETRY=5
 
 ### constants
 # standard account username and md5
 ACCOUNT_FILE=/etc/.auto_connect.cfg
-
-# allow other users to stay for at most TIME_LIMIT mins
-# to avoid wasting their balance.
-TIME_LIMIT=30
 
 # statistic page URL
 STATUS_URL=https://net.tsinghua.edu.cn/cgi-bin/rad_user_info
@@ -33,7 +41,7 @@ function py {
 
 # logger
 function LOG {
-    echo "`getCurrentTime` $1" >> LOG_FILE
+    echo "`getCurrentTime` $1" >> $LOG_FILE
 }
 
 function INFO {
@@ -68,18 +76,19 @@ function getStatus {
 }
 
 function logout {
-    curl -L LOGIN_URL --data "action=logout"
+    curl -L $LOGIN_URL --data "action=logout"
 }
 
 function login {
     read USERNAME MD5 <<< `cat $ACCOUNT_FILE`
-    result=$(curl -sL LOGIN_URL --data "action=login&username="$USERNAME"&password={MD5_HEX}"$MD5"&ac_id=1")
+    result=$(curl -sL $LOGIN_URL --data "action=login&username="$USERNAME"&password={MD5_HEX}"$MD5"&ac_id=1")
     status=`echo $result |awk '{print $3}'`
     if [ $status != "successful." ]; then
         error=`echo $result | awk '{print $1}'`
-    if [ $error = "E2532:" ]; then
+    fi
+    if [[ $error == "E2532:" ]]; then
         ERROR "(E2532) Failed to connect: Login too frequently."
-    elif [ $error = "E2553:" ]; then
+    elif [[ $error == "E2553:" ]]; then
         ERROR "(E2553) Failed to connect: Invalid Account"
     fi
 }
@@ -87,30 +96,28 @@ function login {
 # logout from current network, then login
 function reconnect {
     logout
-    sleep 10
+    sleep $SLEEP_INTERVAL
     login
     echo
 }
 
 ### main
 read UNLIMITED_USERNAME MD5 <<< `cat $ACCOUNT_FILE`
-for try in {1..5}
+for try in {1..$MAX_RETRY}
 do
     status=$(getStatus)
-    if [ -z $status ]; then
+    if [ -z "$status" ]; then
         INFO "Offline. #$try/5 Try to reconnect..."
-        reconnect
+        login
     else
         # load status into variables
-        read username logintime currenttime usage ip <<< echo $status
-
+        read -r username logintime currenttime usage ip <<<$(echo $status)
         # convert time to min
-        time=$(py "round($currenttime-$logintime/60, 3)")
+        time=$(py "'%.3f' % (($currenttime-$logintime)/60)")
 
         # convert network usage to GB
-        usage=$(py "round($usage/1024/1024/1024, 3)")
-
-        INFO "Online. USERNAME-$username IP-$ip TIME-$time USAGE-$usage"
+        usage=$(py "'%.3f' % ($usage/1024/1024/1024)")
+        INFO "Online. USERNAME:$username IP:$ip TIME:$time(min) USAGE:$usage(GB)"
 
         # allow non-standard users to connect in case the unlimited account is
         # banned or expires
