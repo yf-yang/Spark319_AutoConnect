@@ -95,6 +95,8 @@ function login {
         ERROR "(E2532) Failed to connect: Login too frequently."
     elif [[ $error == "E2553:" ]]; then
         ERROR "(E2553) Failed to connect: Invalid Account"
+    else
+        ERROR "Unknown Error $error"
     fi
 }
 
