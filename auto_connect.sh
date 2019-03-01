@@ -108,7 +108,7 @@ function reconnect {
 
 ### main
 read UNLIMITED_USERNAME MD5 <<< `cat $ACCOUNT_FILE`
-for try in {1..$MAX_RETRY}
+for try in $(seq 1 $MAX_RETRY)
 do
     status=$(getStatus)
     if [ -z "$status" ]; then
