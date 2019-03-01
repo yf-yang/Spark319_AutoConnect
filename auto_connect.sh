@@ -88,7 +88,7 @@ function login {
     read USERNAME MD5 <<< `cat $ACCOUNT_FILE`
     result=$(curl -sL $LOGIN_URL --data "action=login&username="$USERNAME"&password={MD5_HEX}"$MD5"&ac_id=1")
     status=`echo $result |awk '{print $3}'`
-    if [ $status != "successful." ]; then
+    if [[ $status != "successful." ]]; then
         error=`echo $result | awk '{print $1}'`
     fi
     if [[ $error == "E2532:" ]]; then
