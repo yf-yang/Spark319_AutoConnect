@@ -18,7 +18,7 @@ TIME_LIMIT=30
 SLEEP_INTERVAL=20
 
 # max number of retry every time
-MAX_RETRY=5
+MAX_RETRY=1
 
 ### constants
 # standard account username and md5
@@ -86,17 +86,23 @@ function logout {
 
 function login {
     read USERNAME MD5 <<< `cat $ACCOUNT_FILE`
-    result=$(curl -sL $LOGIN_URL --data "action=login&username="$USERNAME"&password={MD5_HEX}"$MD5"&ac_id=1")
-    status=`echo $result |awk '{print $3}'`
-    if [[ $status != "successful." ]]; then
-        error=`echo $result | awk '{print $1}'`
-    fi
-    if [[ $error == "E2532:" ]]; then
-        ERROR "(E2532) Failed to connect: Login too frequently."
-    elif [[ $error == "E2553:" ]]; then
-        ERROR "(E2553) Failed to connect: Invalid Account"
+    result=$(curl -sL $LOGIN_URL --connect-timeout 5 --data "action=login&username="$USERNAME"&password={MD5_HEX}"$MD5"&ac_id=1")
+    if [ -z result ]; then
+        status=`echo $result | awk '{print $3}'`
+        if [[ $status != "successful." ]]; then
+            error=`echo $result | awk '{print $1}'`
+            if [[ $error == "E2532:" ]]; then
+                ERROR "(E2532) Failed to connect: Login too frequently."
+            elif [[ $error == "E2553:" ]]; then
+                ERROR "(E2553) Failed to connect: Invalid Account."
+            else
+                ERROR "Unknown Error $error."
+            fi
+        else
+            INFO "Login successful."
+        fi
     else
-        ERROR "Unknown Error $error"
+        ERROR "Login Timeout."
     fi
 }
 
