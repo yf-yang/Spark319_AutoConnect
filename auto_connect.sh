@@ -112,7 +112,7 @@ for try in $(seq 1 $MAX_RETRY)
 do
     status=$(getStatus)
     if [ -z "$status" ]; then
-        INFO "Offline. #$try/5 Try to reconnect..."
+        INFO "Offline. #$try/$MAX_RETRY Try to reconnect..."
         login
     else
         # load status into variables
