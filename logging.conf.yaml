@@ -1,0 +1,27 @@
+version: 1
+disable_existing_loggers: true
+loggers: 
+    src: 
+        handlers: 
+            - fileHandler
+            # - consoleHandler
+handlers: 
+    fileHandler: 
+        level: INFO
+        class: logging.FileHandler
+        formatter: fileFormatter
+        filename: /tmp/auto_connect.log
+        mode: a
+    consoleHandler: 
+        level: DEBUG
+        class: logging.StreamHandler
+        formatter: consoleFormatter
+        stream: ext://sys.stdout
+formatters: 
+    fileFormatter: 
+        format: "%(asctime)s,%(msecs)03d %(levelname)8s %(filename)s:%(lineno)d %(message)s"
+        datefmt: "%Z %x-%X"
+        class: logging.Formatter
+    consoleFormatter: 
+        format: "%(levelname)s %(filename)s:%(lineno)d %(message)s"
+        class: logging.Formatter
