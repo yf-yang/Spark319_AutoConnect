@@ -28,10 +28,13 @@ ACCOUNT_FILE=/etc/.auto_connect.cfg
 STATUS_URL=https://net.tsinghua.edu.cn/cgi-bin/rad_user_info
 
 # login page URL
-LOGIN_URL=net.tsinghua.edu.cn/do_login.php
+LOGIN_URL=http://net.tsinghua.edu.cn:69/cgi-bin/srun_portal
 
 # log file
 LOG_FILE=/tmp/auto_connect.log
+
+# MAC address
+MAC=b0:6e:bf:5c:ce:bc
 
 ### utilities
 # utilities for logging
@@ -81,29 +84,29 @@ function getStatus {
 }
 
 function logout {
-    curl -L $LOGIN_URL --data "action=logout"
+    curl -L $LOGIN_URL --data "action=logout&ac_id=a&username=b&mac=c&type=d"
 }
 
 function login {
     read USERNAME MD5 <<< `cat $ACCOUNT_FILE`
-    result=$(curl -sL $LOGIN_URL -m 5 --data "action=login&username="$USERNAME"&password={MD5_HEX}"$MD5"&ac_id=1")
-    if [ -z result ]; then
-        ERROR "Login Timeout."
-    else
-        status=`echo $result | awk '{print $3}'`
-        if [[ $status != "successful." ]]; then
-            error=`echo $result | awk '{print $1}'`
-            if [[ $error == "E2532:" ]]; then
-                ERROR "(E2532) Failed to connect: Login too frequently."
-            elif [[ $error == "E2553:" ]]; then
-                ERROR "(E2553) Failed to connect: Invalid Account."
-            else
-                ERROR "Unknown Error: $result."
-            fi
-        else
-            INFO "Login successful."
-        fi
-    fi
+    result=$(curl -sL $LOGIN_URL -m 5 --data "action=login&username="$USERNAME"&password="$MD5"&drop=0&pop=0&type=2&n=11&mbytes=0&minutes=0&ac_id=1&mac="$MAC"&chap=1")
+    # if [ -z $result ]; then
+    #     ERROR "Login Timeout."
+    # else
+    #     status=`echo $result | awk '{print $3}'`
+    #     if [[ $status != "successful." ]]; then
+    #         error=`echo $result | awk '{print $1}'`
+    #         if [[ $error == "E2532:" ]]; then
+    #             ERROR "(E2532) Failed to connect: Login too frequently."
+    #         elif [[ $error == "E2553:" ]]; then
+    #             ERROR "(E2553) Failed to connect: Invalid Account."
+    #         else
+    #             ERROR "Unknown Error: $result."
+    #         fi
+    #     else
+    #         INFO "Login successful."
+    #     fi
+    # fi
 }
 
 # logout from current network, then login
