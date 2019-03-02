@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 TIME_LIMIT=30
 
 # interval in seconds between logout and login
-SLEEP_INTERVAL=20
+SLEEP_INTERVAL=10
 
 # max number of retry every time
 MAX_RETRY=1
@@ -38,7 +38,10 @@ def account():
 
 # functions
 def try_login():
-    username, passwd = account()
+    try:
+        username, passwd = account()
+    except IOError:
+        logger.error("Unable to retrieve username and password. Are you root?")
     ch = get_challenge(username)
     if ch is not None:
         r = login(username, passwd, ch['challenge'])
@@ -63,7 +66,11 @@ def try_reconnect(username):
 
 def main():
     try: 
-        unlimited_username, _ = account()
+        try:
+            unlimited_username, _ = account()
+        except IOError:
+            logger.error("Unable to retrieve username and password. "
+                "Are you root?")
         for ntry in range(MAX_RETRY):
             # acquire statistics
             s = status()
