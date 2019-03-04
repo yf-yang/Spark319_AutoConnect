@@ -27,7 +27,7 @@ MAX_RETRY=1
 
 ### constants
 # standard account username and md5
-ACCOUNT_FILE=/etc/.auto_connect.cfg
+ACCOUNT_FILE='/etc/.auto_connect.cfg'
 
 ### utilities
 # acquire username and password
