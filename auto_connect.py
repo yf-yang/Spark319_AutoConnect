@@ -34,14 +34,14 @@ logging_cfg = {
             'class': 'logging.FileHandler',
             'filename': '/tmp/auto_connect.log',
             'formatter': 'fileFormatter',
-            'level': 'INFO',
+            'level': 'DEBUG',
             'mode': 'a'
         }
     },
     'loggers': {
         'src': {
-            'handlers': ['fileHandler'],
-            # 'handlers': ['fileHandler', 'consoleHandler']
+            # 'handlers': ['fileHandler'],
+             'handlers': ['fileHandler', 'consoleHandler']
         }
     },
     'version': 1

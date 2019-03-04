@@ -4,6 +4,8 @@
 import struct
 import numpy as np
 
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning) 
 
 def b2i(b):
     length = (len(b) + 3) // 4

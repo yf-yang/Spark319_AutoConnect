@@ -10,8 +10,8 @@ import sys
 import time
 import urllib
 
-import b64mod
-import xxtea
+from . import b64mod
+from . import xxtea
 
 import pprint
 
@@ -143,40 +143,8 @@ def logout(username, challenge, ip='', double_stack=1, ac_id=1,
 
 
 def status():
-    r = requests.get(STATUS_URL)
-    return
-
-def main():
-    elif sys.argv[1] == 'login' and len(sys.argv) >= 4:
-        usr = sys.argv[2]
-        pwd = sys.argv[3]
-        r = get_challenge(usr)
-        r = login(usr, pwd, r['challenge'])
-        print(r)
-    elif sys.argv[1] == 'logout':
-        r = status()
-        if r is None:
-            print('Not online')
-            return
-        print(r)
-        for x, y in r:
-            if x == 'username':
-                usr = y
-                break
-        r = get_challenge(usr)
-        r = logout(usr, r['challenge'])
-        print(r)
-        pass
-    elif sys.argv[1] == 'status':
-        r = status()
-        if r is None:
-            print('Not online')
-        else:
-            print(r)
-        pass
+    s = requests.get(STATUS_URL).text
+    if s:
+        return tuple(x.strip() for x in s.split(','))
     else:
-        usage()
-
-
-if __name__ == '__main__':
-    main()
+        return s

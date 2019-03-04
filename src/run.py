@@ -85,12 +85,12 @@ def main():
                     _, 
                     usage, # 6 (Bytes)
                     _,
-                    ip # 8,
+                    ip, # 8
                     _,
                     _,
                     _,
                     _,
-                ) = s.split()
+                ) = s
 
                 ### switch units
                 # time elapsed in minutes
@@ -113,7 +113,7 @@ def main():
             else:
                 # offline
                 logger.info("Offline. #%d/%d try to reconnect..." 
-                    % ntry, MAX_RETRY)
+                    % (ntry+1, MAX_RETRY))
                 try_login()
     except:
-        logger.critical("Fatal bug.", exc_info=True)
+        logger.critical("Fatal bug:", exc_info=True)
