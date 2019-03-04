@@ -19,7 +19,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 BASE_URL = 'https://auth4.tsinghua.edu.cn'
-STATUS_URL = 'https://net.tsinghua.edu.cn/cgi-bin/rad_user_info'
+NET_STATUS_URL = 'https://net.tsinghua.edu.cn/cgi-bin/rad_user_info'
 
 def get_challenge(username, ip='', double_stack=1, off_campus=True,
                   tm=time.time()):
@@ -142,9 +142,18 @@ def logout(username, challenge, ip='', double_stack=1, ac_id=1,
     return r
 
 
-def status():
-    s = requests.get(STATUS_URL).text
+def net_status():
+    s = requests.get(NET_STATUS_URL).text
     if s:
         return tuple(x.strip() for x in s.split(','))
     else:
-        return s
+        return None 
+
+def auth_status():
+    r = requests.head(BASE_URL + '/srun_portal_pc.php')
+    if r.next is None:
+        return None
+    else:
+        args = urllib.parse.parse_qsl(urllib.parse.urlparse(r.next.url).query)
+        username, = [x[1] for x in args if x[0] == 'username']
+        return username

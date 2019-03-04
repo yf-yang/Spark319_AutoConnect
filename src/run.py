@@ -1,4 +1,4 @@
-from .tunet import get_challenge, login, logout, status
+from .tunet import get_challenge, login, logout, net_status, auth_status
 
 from time import sleep
 
@@ -48,7 +48,7 @@ def try_login():
         if r is not None:
             logger.info("Connected to the network.")
         else:
-            logger.error("Failed to connect to the network")
+            logger.error("Failed to connect to the network.")
     else:
         logger.error("Failed to acquire challenge.")
 
@@ -73,7 +73,7 @@ def main():
                 "Are you root?")
         for ntry in range(MAX_RETRY):
             # acquire statistics
-            s = status()
+            s = net_status()
             if s:
                 # online
                 (
@@ -114,6 +114,10 @@ def main():
                 # offline
                 logger.info("Offline. #%d/%d try to reconnect..." 
                     % (ntry+1, MAX_RETRY))
-                try_login()
+                username = auth_status()
+                if username:
+                    try_reconnect(username) 
+                else:
+                    try_login()
     except:
         logger.critical("Fatal bug:", exc_info=True)
