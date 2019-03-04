@@ -73,11 +73,13 @@ def main():
                 "Are you root?")
         for ntry in range(MAX_RETRY):
             # acquire statistics
-            s = net_status()
-            if s:
+            username = auth_status()
+            if username:
+                s = net_status()
+            if username and s:
                 # online
                 (
-                    username, # 0
+                    _, 
                     logintime, # 1 (second)
                     currenttime, # 2 (second)
                     _, 
@@ -114,7 +116,6 @@ def main():
                 # offline
                 logger.info("Offline. #%d/%d try to reconnect..." 
                     % (ntry+1, MAX_RETRY))
-                username = auth_status()
                 if username:
                     try_reconnect(username) 
                 else:
