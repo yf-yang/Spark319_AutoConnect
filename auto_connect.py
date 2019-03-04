@@ -40,8 +40,8 @@ logging_cfg = {
     },
     'loggers': {
         'src': {
-            # 'handlers': ['fileHandler'],
-             'handlers': ['fileHandler', 'consoleHandler']
+            'handlers': ['fileHandler'],
+            # 'handlers': ['fileHandler', 'consoleHandler']
         }
     },
     'version': 1
